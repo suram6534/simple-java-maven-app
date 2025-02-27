@@ -1,24 +1,31 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven 3'  // Name defined in Jenkins Global Tool Configuration
+    environment {
+        // Add this line to increase the heartbeat check interval
+        MAVEN_OPTS = '-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400'
     }
 
     stages {
-        stage('Clean') {
+        stage('Checkout') {
             steps {
-                // Run Maven clean task to clean up the project
-                echo 'Running Maven clean...'
-                sh 'mvn clean'
+                git ''
             }
         }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
         stage('Test') {
             steps {
-                sh 'mvn test'  // Run Maven tests
+                sh 'mvn test'
             }
         }
     }
+
     post {
         success {
             echo 'Build, Test, and Package were successful!'
