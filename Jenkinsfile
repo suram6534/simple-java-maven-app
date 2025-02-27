@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+     tools {
+        maven 'Maven 3'  // Name defined in Jenkins Global Tool Configuration
+    }
+
+
     environment {
         // Add this line to increase the heartbeat check interval
         MAVEN_OPTS = '-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400'
