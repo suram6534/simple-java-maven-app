@@ -1,42 +1,30 @@
 pipeline {
-    agent any
-
-     tools {
-        maven 'Maven 3'  // Name defined in Jenkins Global Tool Configuration
-    }
-
-
-    environment {
-        // Add this line to increase the heartbeat check interval
-        MAVEN_OPTS = '-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400'
-    }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/suram6534/simple-java-maven-app.git'
-            }
+    agent {
+        docker {
+            image 'Maven 3'
+            args '-v /root/.m2:/root/.m2'
         }
-
+    }
+    stages {
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn -B -DskipTests clean package'
             }
         }
-
         stage('Test') {
             steps {
                 sh 'mvn test'
             }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
         }
-    }
-
-    post {
-        success {
-            echo 'Build, Test, and Package were successful!'
-        }
-        failure {
-            echo 'Build failed. Please check the logs.'
+        stage('Deliver') {
+            steps {
+                sh './jenkins/scripts/deliver.sh'
+            }
         }
     }
 }
