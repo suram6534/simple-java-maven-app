@@ -13,7 +13,7 @@ pipeline {
                 sh 'mvn clean'
             }
         }
-
+    }
     post {
         success {
             echo 'Build, Test, and Package were successful!'
